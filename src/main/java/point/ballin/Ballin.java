@@ -6,13 +6,18 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroups;
+import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import net.fabricmc.fabric.api.event.player.UseItemCallback;
 
 public class Ballin implements ModInitializer {
 	public static final String MOD_ID = "ballin";
@@ -21,7 +26,7 @@ public class Ballin implements ModInitializer {
 	// It is considered best practice to use your mod id as the logger's name.
 	// That way, it's clear which mod wrote info, warnings, and errors.
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
-	public class ModItems {
+	public static class ModItems {
 		public static final RegistryKey<Item> BALL_KEY = RegistryKey.of(RegistryKeys.ITEM, Identifier.of(Ballin.MOD_ID, "basketball"));
 		public static final Item BASKETBALL = ModItems.register(
 				new Item(new Item.Settings().registryKey(BALL_KEY)),
@@ -30,10 +35,9 @@ public class Ballin implements ModInitializer {
 
 		public static Item register(Item item, RegistryKey<Item> registryKey) {
 			// Register the item.
-			Item registeredItem = Registry.register(Registries.ITEM, registryKey.getValue(), item);
 
-			// Return the registered item!
-			return registeredItem;
+            // Return the registered item!
+			return Registry.register(Registries.ITEM, registryKey.getValue(), item);
 		}
 		public static void initialize() {
 			// Get the event for modifying entries in the ingredients group.
@@ -52,6 +56,13 @@ public class Ballin implements ModInitializer {
 		// Proceed with mild caution.
 		ModItems.initialize();
 		LOGGER.info("Hello Fabric world!");
+		UseItemCallback.EVENT.register((player, world, hand) -> {
+			if (!world.isClient && (player.getMainHandStack().getItem() == Items.DIAMOND)) {
+				// Your logic here, e.g., sending a message to the player
+				((ServerPlayerEntity) player).sendMessage(Text.literal("Right-click detected!"), false);
+			}
+			return ActionResult.PASS;
+		});
 	}
 }
 
