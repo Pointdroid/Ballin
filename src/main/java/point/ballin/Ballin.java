@@ -59,7 +59,7 @@ public class Ballin implements ModInitializer {
 		UseItemCallback.EVENT.register((player, world, hand) -> {
 			if (!world.isClient && (player.getMainHandStack().getItem() == Items.DIAMOND)) {
 				// Your logic here, e.g., sending a message to the player
-				((ServerPlayerEntity) player).sendMessage(Text.literal("Right-click detected!"), false);
+				player.sendMessage(Text.literal("Right-click detected!"), false);
 			}
 			return ActionResult.PASS;
 		});
